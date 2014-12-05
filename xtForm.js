@@ -20,6 +20,21 @@
         this.ngModel = ngModel;
         this.attrs = attrs;
 
+        var parent = self.getParent(element);
+
+        element.bind('focus', function() {
+        	if(parent.hasClass('has-error')){
+        		self.showErrors();
+        	}
+        });
+
+        element.bind('blur', function () {
+        	if(ngModel.$invalid){
+        		parent.addClass('has-error');
+        	}
+        });
+
+
         var observe = function (prop) {
             var innerProp = prop;
             attrs.$observe(innerProp, function (val) {
@@ -48,6 +63,27 @@
             }
         }, true);
     }
+  	InputValidator.prototype.getParent = function (element) {
+  		var parent = element.parent();
+  		if(!parent.hasClass('form-group')){
+    		parent = parent.parent();
+    	}
+    	return parent;
+  	};
+
+    InputValidator.prototype.setParentError = function (element) {
+    	var parent = this.getParent(element);
+    	if (!parent.hasClass('has-error')) {
+    		parent.addClass('has-error');
+    	}
+    };
+
+    InputValidator.prototype.removeParentError = function (element) {
+    	var parent = this.getParent(element);
+    	if (parent.hasClass('has-error')) {
+    		parent.removeClass('has-error');
+    	}
+    };
 
     InputValidator.prototype.setDirty = function (value) {
         this.ngModel.$dirty = value;
@@ -62,7 +98,7 @@
         var ngModel = this.ngModel;
         this.setDirty(true);
         if (!ngModel.$valid) {
-
+        	this.setParentError(this.element);
             // build error summary
             var errors = '',
                 propCount = 0;
@@ -95,8 +131,6 @@
                 errors += ngModel.$error.messages;
             }
 
-            this.element.addClass('xt-error');
-
             // allow for a different tooltip element
             if (this.attrs.tooltipElement) {
                 this.element = angular.element(document.getElementById(this.attrs.tooltipElement));
@@ -111,9 +145,9 @@
             this.element.tooltip({
                 html: true,
                 title: errors,
-                placement: this.attrs.placement || 'bottom',
-                trigger: this.attrs.trigger || 'focus hover',
-                container: this.attrs.container || 'body'
+                placement: this.attrs.placement || 'top',
+                trigger: this.attrs.trigger || 'focus',
+                container: this.attrs.container || 'body',
             });
 
             if (this.profile === 'showAll' || !isSubmit) {
@@ -133,7 +167,10 @@
             // remove tooltip if needed
             if (that.tooltipSet) {
                 that.ngModel.$error.messages = undefined;
-                that.element.removeClass('xt-error');
+                that.removeParentError(that.element);
+                // that.element.parent().removeClass('has-error');
+                // that.element.parent().parent().removeClass('has-error');
+                // that.element.parent().removeClass('has-error');
                 that.element.tooltip('destroy');
                 that.tooltipSet = false;
                 that.scope.$apply();
@@ -296,6 +333,7 @@
                 link: function (scope, element, attrs, ctrls) {
                     var ngModel = ctrls[0],
                         xtFormCtrl = ctrls[1],
+                        regForm = ctrls[2],
                         errors = angular.copy(xtFormErrors);
 
                     if (ngModel.$name === undefined) {
@@ -305,8 +343,13 @@
                     if (element[0].nodeName.toUpperCase() === 'SELECT' && attrs.placement === undefined) {
                         attrs.placement = 'top';
                     }
+           //          element.bind('blur', function() {
+           //          	var elName =element.attr('name');
+			        // 	element.toggleClass('xt-error', regForm[elName].$invalid);
+			        // });
 
                     var validator = new InputValidator(scope, element, attrs, ngModel, errors);
+
                     xtFormCtrl.validators.registerValidator(attrs.name, validator);
                     element.on('$destroy', function () {
                         if (xtFormCtrl && xtFormCtrl.validators && xtFormCtrl.validators.hasValidator(attrs.name)) {
