@@ -138,7 +138,7 @@
             }
 
             if (this.tooltipSet === true) {
-                this.element.tooltip('destroy');
+                // this.element.tooltip('destroy');
             }
 
             // create tooltip
@@ -151,7 +151,7 @@
             });
 
             if (this.profile === 'showAll' || !isSubmit) {
-                // this.element.tooltip('show');
+                this.element.tooltip('show');
             }
 
             this.tooltipSet = true;
