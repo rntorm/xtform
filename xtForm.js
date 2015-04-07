@@ -22,11 +22,11 @@
 
         var parent = self.getParent(element);
 
-        // element.bind('focus', function() {
-        // 	if(parent.hasClass('has-error')){
-        // 		self.showErrors();
-        // 	}
-        // });
+        element.bind('focus', function() {
+        	if(parent.hasClass('has-error')){
+        		self.showErrors();
+        	}
+        });
 
         element.bind('blur', function () {
         	if(ngModel.$invalid){
@@ -151,7 +151,7 @@
             });
 
             if (this.profile === 'showAll' || !isSubmit) {
-                this.element.tooltip('show');
+                // this.element.tooltip('show');
             }
 
             this.tooltipSet = true;
@@ -168,9 +168,6 @@
             if (that.tooltipSet) {
                 that.ngModel.$error.messages = undefined;
                 that.removeParentError(that.element);
-                // that.element.parent().removeClass('has-error');
-                // that.element.parent().parent().removeClass('has-error');
-                // that.element.parent().removeClass('has-error');
                 that.element.tooltip('destroy');
                 that.tooltipSet = false;
                 that.scope.$apply();
