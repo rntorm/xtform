@@ -315,7 +315,9 @@
                     element.on('submit', function (evt) {
                         submit();
                         var firstError = element[0].querySelector('.ng-dirty');
-                        firstError.focus();
+                        if(firstError) {
+                        	firstError.focus();
+                        }
                         evt.preventDefault();
                         return false;
                     });
