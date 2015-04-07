@@ -313,9 +313,9 @@
 
                     // wire up default submit of form to save function
                     element.on('submit', function (evt) {
-                    	var firstError = element[0].querySelector('.ng-dirty');
-                        firstError.focus();
                         submit();
+                        var firstError = element[0].querySelector('.ng-dirty');
+                        firstError.focus();
                         evt.preventDefault();
                         return false;
                     });
